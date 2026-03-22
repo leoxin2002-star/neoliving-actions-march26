@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neo Living — Action Items · March 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      min-height: 100vh;
+      padding: 0 0 48px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #0f2340 0%, #1a3a5c 60%, #1e4976 100%);
+      color: #fff;
+      padding: 40px 24px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .header-logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+    .header h1 {
+      font-size: clamp(22px, 5vw, 32px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+    }
+    .header h1 span { color: #5bb8ff; }
+    .header-sub {
+      margin-top: 8px;
+      font-size: 15px;
+      opacity: 0.75;
+      font-weight: 400;
+    }
+    .header-meta {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .meta-chip {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+
+    /* ── Stats bar ── */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      background: #fff;
+      border-bottom: 1px solid #e8ecf2;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1;
+      min-width: 100px;
+      max-width: 200px;
+      text-align: center;
+      padding: 18px 12px;
+      border-right: 1px solid #e8ecf2;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+    .stat-num.green  { color: #16a34a; }
+    .stat-num.blue   { color: #1d4ed8; }
+    .stat-num.orange { color: #d97706; }
+    .stat-label { font-size: 11px; color: #777; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 960px;
+      margin: 28px auto 0;
+      padding: 0 20px;
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; padding: 0 12px; }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: box-shadow 0.18s, transform 0.18s;
+      position: relative;
+    }
+    .card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+      transform: translateY(-2px);
+    }
+    .card.high   { border-left: 4px solid #e53935; }
+    .card.medium { border-left: 4px solid #f57c00; }
+    /* Completed cards — greyed out */
+    .card.done {
+      border-left: 4px solid #16a34a;
+      opacity: 0.62;
+      background: #f9fbf9;
+    }
+    .card.done:hover { opacity: 0.8; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a3a5c, #1e4976);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card.done .badge { background: linear-gradient(135deg, #15803d, #16a34a); }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: #111827;
+      flex: 1;
+    }
+    .card.done .card-title { color: #4b5563; text-decoration: line-through; text-decoration-color: #9ca3af; }
+
+    .card-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .pill {
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    /* Owner colours */
+    .pill-jackson  { background: #dbeafe; color: #1d4ed8; }
+    .pill-ethan    { background: #d1fae5; color: #065f46; }
+    .pill-marcus   { background: #ede9fe; color: #5b21b6; }
+    .pill-leo      { background: #ffedd5; color: #c2410c; }
+    .pill-dunn     { background: #ccfbf1; color: #0f766e; }
+    .pill-david    { background: #fee2e2; color: #b91c1c; }
+    .pill-tue      { background: #fef9c3; color: #92400e; }
+    /* Priority */
+    .pill-high     { background: #fee2e2; color: #b91c1c; }
+    .pill-medium   { background: #fff3cd; color: #92400e; }
+    /* Status */
+    .pill-open       { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .pill-completed  { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .pill-inprogress { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+    .pill-scheduled  { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    /* Pre-China */
+    .pill-china    { background: #fef3c7; color: #78350f; font-size: 11px; border: 1px solid #fcd34d; }
+
+    /* ── Week Plan Section ── */
+    .week-plan {
+      max-width: 960px;
+      margin: 36px auto 0;
+      padding: 0 20px;
+    }
+    .week-plan-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f2340;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .week-plan-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(to right, #1e4976, transparent);
+      border-radius: 2px;
+    }
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 600px) {
+      .week-grid { grid-template-columns: 1fr; }
+    }
+    .week-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    .week-card.monday    { border-top: 4px solid #f59e0b; }
+    .week-card.midweek   { border-top: 4px solid #3b82f6; }
+    .week-card.lateweek  { border-top: 4px solid #8b5cf6; }
+    .week-card.weekend   { border-top: 4px solid #10b981; grid-column: 1 / -1; }
+    .week-day-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    .week-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .week-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .week-item-num {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #0f2340;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .week-item-text {
+      font-size: 13.5px;
+      color: #1f2937;
+      line-height: 1.45;
+    }
+    .week-item-text strong { font-weight: 700; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 0 20px;
+    }
+    .footer-inner {
+      display: inline-block;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 28px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .footer-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; }
+    .footer a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #0f2340, #1e4976);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .footer a:hover { opacity: 0.88; }
+    .footer-note { font-size: 11.5px; color: #94a3b8; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">Neo Living Australia</div>
+    <h1>Monthly Conference<br/><span>Action Items</span></h1>
+    <div class="header-sub">Updated 22 March 2026 · Week 24–28 March</div>
+    <div class="header-meta">
+      <span class="meta-chip">📅 18 March 2026</span>
+      <span class="meta-chip">👥 Full Team</span>
+      <span class="meta-chip">🔒 Confidential</span>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num green">6</div><div class="stat-label">✅ Completed</div></div>
+    <div class="stat"><div class="stat-num blue">3</div><div class="stat-label">🔵 In Progress</div></div>
+    <div class="stat"><div class="stat-num orange">7</div><div class="stat-label">🗓 Scheduled</div></div>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="grid">
+
+    <!-- 1 — NOT YET, mid next week -->
+    <div class="card high">
+      <div class="card-top">
+        <div class="badge">1</div>
+        <div class="card-title">Fix CPQ with real product photos. Disclaimer that photos are indicative. Remove AI imagery.</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-jackson">Jackson</span>
+        <span class="pill pill-leo">Leo</span>
+        <span class="pill pill-high">🔴 High</span>
+        <span class="pill pill-scheduled">🗓 Mid Next Week</span>
+      </div>
+    </div>
+
+    <!-- 2 — NOT YET, mid next week -->
+    <div class="card high">
+      <div class="card-top">
+        <div class="badge">2</div>
+        <div class="card-title">Pricing update for Jackson — accurate quoting</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-marcus">Marcus</span>
+        <span class="pill pill-leo">Leo</span>
+        <span class="pill pill-high">🔴 High</span>
+        <span class="pill pill-scheduled">🗓 Mid Next Week</span>
+      </div>
+    </div>
+
+    <!-- 3 — NOT YET, late next week (waiting on Dunn) -->
+    <div class="card medium">
+      <div class="card-top">
+        <div class="badge">3</div>
+        <div class="card-title">Clickable CPQ links showing interior renderings per Design Package</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-ethan">Ethan</span>
+        <span class="pill pill-david">David</span>
+        <span class="pill pill-medium">🟠 Medium</span>
+        <span class="pill pill-scheduled">🗓 Late Next Week</span>
+      </div>
+    </div>
+
+    <!-- 4 — COMPLETED -->
+    <div class="card done">
+      <div class="card-top">
+        <div class="badge">4</div>
+        <div class="card-title">Connect David with Tue — factory photos → approval → client portal</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-leo">Leo</span>
+        <span class="pill pill-david">David</span>
+        <span class="pill pill-tue">Tue</span>
+        <span class="pill pill-completed">✅ Completed</span>
+      </div>
+    </div>
+
+    <!-- 5 — COMPLETED -->
+    <div class="card done">
+      <div class="card-top">
+        <div class="badge">5</div>
+        <div class="card-title">Set up 1300 number + work phone call sequence</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-leo">Leo</span>
+        <span class="pill pill-completed">✅ Completed</span>
+      </div>
+    </div>
+
+    <!-- 6 — NOT YET, mid next week -->
+    <div class="card high">
+      <div class="card-top">
+        <div class="badge">6</div>
+        <div class="card-title">Update disbursement process for Ethan — accurate estimates</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-marcus">Marcus</span>
+        <span class="pill pill-ethan">Ethan</span>
+        <span class="pill pill-high">🔴 High</span>
+        <span class="pill pill-scheduled">🗓 Mid Next Week</span>
+      </div>
+    </div>
+
+    <!-- 7 — NOT YET, Monday next week -->
+    <div class="card medium">
+      <div class="card-top">
+        <div class="badge">7</div>
+        <div class="card-title">Update website with more interior photos</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-leo">Leo</span>
+        <span class="pill pill-medium">🟠 Medium</span>
+        <span class="pill pill-scheduled">🗓 Monday 23 Mar</span>
+      </div>
+    </div>
+
+    <!-- 8 (was 9) — IN PROGRESS -->
+    <div class="card medium">
+      <div class="card-top">
+        <div class="badge">8</div>
+        <div class="card-title">Break up "Plan" stage on customer portal into sub-stages</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-ethan">Ethan</span>
+        <span class="pill pill-tue">Tue</span>
+        <span class="pill pill-medium">🟠 Medium</span>
+        <span class="pill pill-inprogress">🔵 In Progress</span>
+      </div>
+    </div>
+
+    <!-- 9 (was 10) — IN PROGRESS -->
+    <div class="card high">
+      <div class="card-top">
+        <div class="badge">9</div>
+        <div class="card-title">David to email client updates during manufacturing</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-david">David</span>
+        <span class="pill pill-ethan">Ethan</span>
+        <span class="pill pill-high">🔴 High</span>
+        <span class="pill pill-inprogress">🔵 In Progress</span>
+      </div>
+    </div>
+
+    <!-- 10 (was 11) — COMPLETED -->
+    <div class="card done">
+      <div class="card-top">
+        <div class="badge">10</div>
+        <div class="card-title">Dunn to brief David on email tracking per project</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-dunn">Dunn</span>
+        <span class="pill pill-david">David</span>
+        <span class="pill pill-completed">✅ Completed</span>
+      </div>
+    </div>
+
+    <!-- 11 (was 12) — NOT YET, late next week -->
+    <div class="card high">
+      <div class="card-top">
+        <div class="badge">11</div>
+        <div class="card-title">Manufacturing sheets completed at prelim stage</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-dunn">Dunn</span>
+        <span class="pill pill-ethan">Ethan</span>
+        <span class="pill pill-high">🔴 High</span>
+        <span class="pill pill-scheduled">🗓 Late Next Week</span>
+      </div>
+    </div>
+
+    <!-- 12 (was 13) — COMPLETED -->
+    <div class="card done">
+      <div class="card-top">
+        <div class="badge">12</div>
+        <div class="card-title">Document the Sales handover process clearly</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-jackson">Jackson</span>
+        <span class="pill pill-ethan">Ethan</span>
+        <span class="pill pill-marcus">Marcus</span>
+        <span class="pill pill-completed">✅ Completed</span>
+      </div>
+    </div>
+
+    <!-- 13 (was 14) — NOT YET, late next week -->
+    <div class="card high">
+      <div class="card-top">
+        <div class="badge">13</div>
+        <div class="card-title">Marcus — centralised data capturing system</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-marcus">Marcus</span>
+        <span class="pill pill-high">🔴 High</span>
+        <span class="pill pill-scheduled">🗓 Late Next Week</span>
+      </div>
+    </div>
+
+    <!-- 14 (was 15) — IN PROGRESS, this weekend -->
+    <div class="card medium">
+      <div class="card-top">
+        <div class="badge">14</div>
+        <div class="card-title">Leo to lead marketing</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-leo">Leo</span>
+        <span class="pill pill-medium">🟠 Medium</span>
+        <span class="pill pill-inprogress">🔵 In Progress — This Weekend</span>
+      </div>
+    </div>
+
+    <!-- 15 (was 16) — COMPLETED -->
+    <div class="card done">
+      <div class="card-top">
+        <div class="badge">15</div>
+        <div class="card-title">Add hot water system to standard plan</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-dunn">Dunn</span>
+        <span class="pill pill-completed">✅ Completed</span>
+      </div>
+    </div>
+
+    <!-- 16 (was 17) — COMPLETED -->
+    <div class="card done">
+      <div class="card-top">
+        <div class="badge">16</div>
+        <div class="card-title">Dunn to confirm existing projects will be handed over. Flag special requests.</div>
+      </div>
+      <div class="card-pills">
+        <span class="pill pill-dunn">Dunn</span>
+        <span class="pill pill-completed">✅ Completed</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Week Plan Section -->
+  <div class="week-plan">
+    <div class="week-plan-title">📅 Week Plan — 24–28 March 2026</div>
+    <div class="week-grid">
+
+      <!-- Monday -->
+      <div class="week-card monday">
+        <div class="week-day-label">☀️ Monday · 23 March</div>
+        <div class="week-item">
+          <div class="week-item-num">7</div>
+          <div class="week-item-text"><strong>Start website interior photos update</strong> — gather latest factory &amp; interior images and update the website gallery</div>
+        </div>
+      </div>
+
+      <!-- Mid Week -->
+      <div class="week-card midweek">
+        <div class="week-day-label">📘 Tuesday / Wednesday · Mid Week</div>
+        <div class="week-item">
+          <div class="week-item-num">1</div>
+          <div class="week-item-text"><strong>CPQ real photos</strong> — schedule session with Catherine for factory estimation tool first</div>
+        </div>
+        <div class="week-item">
+          <div class="week-item-num">2</div>
+          <div class="week-item-text"><strong>Pricing update meeting with Jackson</strong> — finalise accurate quoting figures</div>
+        </div>
+        <div class="week-item">
+          <div class="week-item-num">6</div>
+          <div class="week-item-text"><strong>Build disbursement programme for Ethan</strong> — define programme structure and estimates</div>
+        </div>
+      </div>
+
+      <!-- Late Week -->
+      <div class="week-card lateweek">
+        <div class="week-day-label">🔮 Thursday / Friday · Late Week</div>
+        <div class="week-item">
+          <div class="week-item-num">3</div>
+          <div class="week-item-text"><strong>CPQ clickable links</strong> — follow up with Dunn, implement Design Package interior renderings</div>
+        </div>
+        <div class="week-item">
+          <div class="week-item-num">8</div>
+          <div class="week-item-text"><strong>Customer portal plan stage</strong> — check progress with Tue on sub-stage breakdown</div>
+        </div>
+        <div class="week-item">
+          <div class="week-item-num">9</div>
+          <div class="week-item-text"><strong>Finalise David email client update process</strong> — confirm cadence and template with David</div>
+        </div>
+        <div class="week-item">
+          <div class="week-item-num">11</div>
+          <div class="week-item-text"><strong>Manufacturing sheets at prelim</strong> — follow up with Dunn on completion status</div>
+        </div>
+        <div class="week-item">
+          <div class="week-item-num">13</div>
+          <div class="week-item-text"><strong>Centralised data system</strong> — follow up with Marcus on plan and tooling choice</div>
+        </div>
+      </div>
+
+      <!-- Weekend -->
+      <div class="week-card weekend">
+        <div class="week-day-label">🌿 Weekend · 22–23 March</div>
+        <div class="week-item">
+          <div class="week-item-num">14</div>
+          <div class="week-item-text"><strong>Leo leads marketing activities</strong> — content creation, social planning, campaign prep</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="footer-label">Track Progress</div>
+      <a href="https://leoxin2002-star.github.io/neoliving-mission-control/" target="_blank">
+        🚀 Mission Control
+      </a>
+      <div class="footer-note">Neo Living Australia · Monthly Conference · 18 March 2026 · Updated 22 March 2026</div>
+    </div>
+  </div>
+
+</body>
+</html>
